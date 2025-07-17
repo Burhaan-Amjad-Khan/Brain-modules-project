@@ -1,20 +1,34 @@
+# app.py
+
 import streamlit as st
-from model import load_model, predict_image
+from model import load_model
 from PIL import Image
 import torch
+import torchvision.transforms as transforms
+import numpy as np
 
-# Load the trained model
 model = load_model("brain_model.pth")
 
-# Streamlit UI
-st.set_page_config(page_title="Brain Surgery Disease Prediction", layout="centered")
-st.title("🧠 Brain Module - Disease Prediction from MRI")
+CLASS_NAMES = ['glioma', 'meningioma', 'no tumor', 'pituitary']
 
-uploaded_file = st.file_uploader("Upload a Brain MRI Image", type=["png", "jpg", "jpeg"])
+def predict(image):
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor()
+    ])
+    img = transform(image).unsqueeze(0)  # add batch dimension
+    outputs = model(img)
+    _, predicted = torch.max(outputs, 1)
+    return CLASS_NAMES[predicted[0].item()]
+
+st.title("Brain Tumor Classification")
+
+uploaded_file = st.file_uploader("Upload Brain MRI Image", type=['jpg', 'png', 'jpeg'])
+
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded MRI", use_column_width=True)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
     if st.button("Predict"):
-        prediction = predict_image(model, image)
-        st.success(f"Predicted Disease: **{prediction}**")
+        label = predict(image)
+        st.success(f"Predicted: {label}")
