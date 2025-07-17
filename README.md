@@ -1,21 +1,23 @@
-# 🧠 Brain MRI Disease Detection App
+# 🧠 Brain Tumor Segmentation with U-Net++
 
-This Streamlit web application predicts brain-related diseases from MRI images using a deep learning model trained on medical imaging data.
+This project performs medical image segmentation to detect brain tumor regions in MRI slices using a U-Net++ architecture built in PyTorch.
 
-## 🔍 Overview
+## 🚀 Features
+- Trained on BraTS2020 dataset
+- Uses U-Net++ model for accurate segmentation
+- Dice + BCE Loss for performance
+- Deployed with Streamlit for live web interaction
 
-This project uses a PyTorch-based convolutional neural network to classify uploaded brain MRI images as either:
+## 📁 Files
 
-- **Tumor**
-- **No Tumor**
-
-The model has been trained and exported as a `.pth` file and is integrated into a user-friendly Streamlit interface.
-
-## 🧠 Use Case
-
-This AI tool helps doctors and radiologists:
-- Quickly identify brain tumors.
-- Support second-opinion diagnosis.
-- Reduce diagnostic delays.
+- `model.py`: Contains model architecture and loading function
+- `app.py`: Streamlit frontend to upload MRI and display predictions
+- `brain_model.pth`: Trained model weights
+- `requirements.txt`: Dependencies
 
 
+## ✅ How to Run
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
