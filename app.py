@@ -1,33 +1,33 @@
-# app.py
-
 import streamlit as st
+import numpy as np
+import torch
+import cv2
 from model import load_model
 from PIL import Image
-import torch
-import torchvision.transforms as transforms
 
+st.set_page_config(page_title="Brain Tumor Segmentation", layout="centered")
+
+st.title("🧠 Brain Tumor Segmentation with U-Net++")
+st.markdown("Upload an MRI brain scan image to segment tumor regions.")
+
+# Load model
 model = load_model("brain_model.pth")
 
-CLASS_NAMES = ['glioma', 'meningioma', 'no tumor', 'pituitary']
-
-def predict(image):
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor()
-    ])
-    img = transform(image).unsqueeze(0)  # Add batch dimension
-    outputs = model(img)
-    _, predicted = torch.max(outputs, 1)
-    return CLASS_NAMES[predicted[0].item()]
-
-st.title("Brain Tumor Classification App")
-
-uploaded_file = st.file_uploader("Upload a Brain MRI Image", type=['jpg', 'jpeg', 'png'])
+# File uploader
+uploaded_file = st.file_uploader("Upload MRI scan image (PNG/JPG)", type=["png", "jpg", "jpeg"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    image = Image.open(uploaded_file).convert("L")
+    image = image.resize((128, 128))
+    img_array = np.array(image) / 255.0
+    img_tensor = torch.tensor(img_array, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
 
-    if st.button("Predict"):
-        label = predict(image)
-        st.success(f"Prediction: {label}")
+    with torch.no_grad():
+        output = model(img_tensor)
+        mask = (output.squeeze().numpy() > 0.5).astype(np.uint8) * 255
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(image, caption="Original", use_column_width=True)
+    with col2:
+        st.image(mask, caption="Predicted Mask", use_column_width=True)
