@@ -5,7 +5,6 @@ from model import load_model
 from PIL import Image
 import torch
 import torchvision.transforms as transforms
-import numpy as np
 
 model = load_model("brain_model.pth")
 
@@ -16,14 +15,14 @@ def predict(image):
         transforms.Resize((224, 224)),
         transforms.ToTensor()
     ])
-    img = transform(image).unsqueeze(0)  # add batch dimension
+    img = transform(image).unsqueeze(0)  # Add batch dimension
     outputs = model(img)
     _, predicted = torch.max(outputs, 1)
     return CLASS_NAMES[predicted[0].item()]
 
-st.title("Brain Tumor Classification")
+st.title("Brain Tumor Classification App")
 
-uploaded_file = st.file_uploader("Upload Brain MRI Image", type=['jpg', 'png', 'jpeg'])
+uploaded_file = st.file_uploader("Upload a Brain MRI Image", type=['jpg', 'jpeg', 'png'])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
@@ -31,4 +30,4 @@ if uploaded_file is not None:
 
     if st.button("Predict"):
         label = predict(image)
-        st.success(f"Predicted: {label}")
+        st.success(f"Prediction: {label}")
