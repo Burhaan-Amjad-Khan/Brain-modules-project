@@ -1,6 +1,6 @@
 streamlit
-torch
-torchvision
-Pillow
 opencv-python
 numpy
+Pillow
+tensorflow
+scikit-learn
